@@ -14,6 +14,7 @@ Before, your keyboard hardware must support N—key rollover.If your keyboard is
 https://github.com/espressif/arduino-esp32/tree/master/libraries/USB/examples/Keyboard
 https://github.com/T-vK/ESP32-BLE-Keyboard
 ```
+本仓库中的example是我实际做出来的一个键盘，已在嘉立创开源广场发布，因为代码比较混乱，不建议作为全键无冲键盘库的使用案例，单纯用库还是参考官方案例，但如果想copy我的键盘，可以直接使用我的代码。
 
 # 功能
 * 本键盘库修改了报告描述符，原版本只支持修饰键以外的最多6键同时按下，修改后使用17Byte的每1bit表示1个按键，映射至HID Usage Tables文档中Keyboard usage page的0-135号useage id，可支持这136个按键同时按下，但由于官方键盘库映射至ascii表的处理以及保留按键的存在，实际可同时按下的键要少于136；
