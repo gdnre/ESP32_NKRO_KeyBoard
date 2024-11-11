@@ -512,9 +512,18 @@ size_t NkroBleKeyboard::write(const uint8_t *buffer, size_t size)
 	return n;
 }
 
+void NkroBleKeyboard::register_connect_event(ble_connect_event_cb_t eventCb)
+{
+	this->connect_cb = eventCb;
+}
+
 void NkroBleKeyboard::onConnect(BLEServer *pServer)
 {
 	this->connected = true;
+	if (this->connect_cb != NULL)
+	{
+		this->connect_cb(this->connected);
+	}
 
 #if !defined(USE_NIMBLE)
 
@@ -529,7 +538,10 @@ void NkroBleKeyboard::onConnect(BLEServer *pServer)
 void NkroBleKeyboard::onDisconnect(BLEServer *pServer)
 {
 	this->connected = false;
-
+	if (this->connect_cb != NULL)
+	{
+		this->connect_cb(this->connected);
+	}
 #if !defined(USE_NIMBLE)
 
 	BLE2902 *desc = (BLE2902 *)this->inputKeyboard->getDescriptorByUUID(BLEUUID((uint16_t)0x2902));

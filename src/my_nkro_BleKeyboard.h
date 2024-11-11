@@ -14,13 +14,13 @@
 #include "NimBLECharacteristic.h"
 #include "NimBLEHIDDevice.h"
 
-#define BLEDevice                  NimBLEDevice
-#define BLEServerCallbacks         NimBLEServerCallbacks
+#define BLEDevice NimBLEDevice
+#define BLEServerCallbacks NimBLEServerCallbacks
 #define BLECharacteristicCallbacks NimBLECharacteristicCallbacks
-#define BLEHIDDevice               NimBLEHIDDevice
-#define BLECharacteristic          NimBLECharacteristic
-#define BLEAdvertising             NimBLEAdvertising
-#define BLEServer                  NimBLEServer
+#define BLEHIDDevice NimBLEHIDDevice
+#define BLECharacteristic NimBLECharacteristic
+#define BLEAdvertising NimBLEAdvertising
+#define BLEServer NimBLEServer
 
 #else
 
@@ -40,15 +40,15 @@ typedef uint8_t nkro_MediaKeyReport[2];
 
 #ifndef ESP32_BLE_KEYBOARD_H
 
-//和官方USBHIDKeyBoard库一起使用时要注释掉关于按键的定义
-// const uint8_t KEY_LEFT_CTRL = 0x80;
-// const uint8_t KEY_LEFT_SHIFT = 0x81;
-// const uint8_t KEY_LEFT_ALT = 0x82;
-// const uint8_t KEY_LEFT_GUI = 0x83;
-// const uint8_t KEY_RIGHT_CTRL = 0x84;
-// const uint8_t KEY_RIGHT_SHIFT = 0x85;
-// const uint8_t KEY_RIGHT_ALT = 0x86;
-// const uint8_t KEY_RIGHT_GUI = 0x87;
+// 和官方USBHIDKeyBoard库一起使用时要注释掉关于按键的定义
+//  const uint8_t KEY_LEFT_CTRL = 0x80;
+//  const uint8_t KEY_LEFT_SHIFT = 0x81;
+//  const uint8_t KEY_LEFT_ALT = 0x82;
+//  const uint8_t KEY_LEFT_GUI = 0x83;
+//  const uint8_t KEY_RIGHT_CTRL = 0x84;
+//  const uint8_t KEY_RIGHT_SHIFT = 0x85;
+//  const uint8_t KEY_RIGHT_ALT = 0x86;
+//  const uint8_t KEY_RIGHT_GUI = 0x87;
 
 // const uint8_t KEY_UP_ARROW = 0xDA;
 // const uint8_t KEY_DOWN_ARROW = 0xD9;
@@ -137,34 +137,38 @@ typedef struct
   uint8_t keys[17];
 } NkroBLEKeyReport;
 
+typedef void (*ble_connect_event_cb_t)(bool isConnected);
+
 class NkroBleKeyboard : public Print, public BLEServerCallbacks, public BLECharacteristicCallbacks
 {
 private:
-  BLEHIDDevice* hid;
-  BLECharacteristic* inputKeyboard;
-  BLECharacteristic* outputKeyboard;
-  BLECharacteristic* inputMediaKeys;
-  BLEAdvertising*    advertising;
-  NkroBLEKeyReport          _keyReport;
+  BLEHIDDevice *hid;
+  BLECharacteristic *inputKeyboard;
+  BLECharacteristic *outputKeyboard;
+  BLECharacteristic *inputMediaKeys;
+  BLEAdvertising *advertising;
+  NkroBLEKeyReport _keyReport;
 
-  std::string        deviceName;
-  std::string        deviceManufacturer;
-  uint8_t            batteryLevel;
-  bool               connected = false;
-  uint32_t           _delay_ms = 7;
+  std::string deviceName;
+  std::string deviceManufacturer;
+  uint8_t batteryLevel;
+  bool connected = false;
+  uint32_t _delay_ms = 7;
   void delay_ms(uint64_t ms);
 
-  uint16_t vid       = 0x05ac;
-  uint16_t pid       = 0x820a;
-  uint16_t version   = 0x0210;
+  uint16_t vid = 0x05ac;
+  uint16_t pid = 0x820a;
+  uint16_t version = 0x0210;
+
+  ble_connect_event_cb_t connect_cb = NULL;
 
 public:
-  nkro_MediaKeyReport     _mediaKeyReport;
+  nkro_MediaKeyReport _mediaKeyReport;
   NkroBleKeyboard(std::string deviceName = "ESP32-S3 BLE-KB", std::string deviceManufacturer = "Espressif", uint8_t batteryLevel = 100);
   void begin(void);
   void end(void);
-  void sendReport(NkroBLEKeyReport* keys);
-  void sendReport(nkro_MediaKeyReport* keys);
+  void sendReport(NkroBLEKeyReport *keys);
+  void sendReport(nkro_MediaKeyReport *keys);
   size_t press(uint8_t k);
   size_t press(const nkro_MediaKeyReport k);
   size_t release(uint8_t k);
@@ -175,18 +179,20 @@ public:
   void releaseAll(void);
   bool isConnected(void);
   void setBatteryLevel(uint8_t level);
-  void setName(std::string deviceName);  
+  void setName(std::string deviceName);
   void setDelay(uint32_t ms);
 
   void set_vendor_id(uint16_t vid);
   void set_product_id(uint16_t pid);
   void set_version(uint16_t version);
-protected:
-  virtual void onStarted(BLEServer *pServer) { };
-  virtual void onConnect(BLEServer* pServer) override;
-  virtual void onDisconnect(BLEServer* pServer) override;
-  virtual void onWrite(BLECharacteristic* me) override;
 
+  void register_connect_event(ble_connect_event_cb_t eventCb);
+
+protected:
+  virtual void onStarted(BLEServer *pServer) {};
+  virtual void onConnect(BLEServer *pServer) override;
+  virtual void onDisconnect(BLEServer *pServer) override;
+  virtual void onWrite(BLECharacteristic *me) override;
 };
 
 #endif // CONFIG_BT_ENABLED
