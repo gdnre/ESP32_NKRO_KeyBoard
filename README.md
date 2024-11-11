@@ -1,6 +1,10 @@
 This library allows your ESP32 keyboard support N—key rollover model.
 
 Before, your keyboard hardware must support N—key rollover.If your keyboard is based on key matrix，each key may have a diode or triode.
+# 更新
+## 24.11.11更新
+* 添加register_connect_event函数，用于在连接状态发生变化（onConnect和onDisconnect）时，执行注册的回调函数，同时只能注册1个回调函数；
+
 # 前言
 * 本键盘库包括USB键盘以及蓝牙键盘功能，请根据设备硬件选择需要的版本，USB键盘只有ESP32-S2/S3支持，ESP32-S2不支持蓝牙功能；
   
